@@ -23,6 +23,9 @@
         </div>
 
         <div id="projects">
+            <ul id="ullistprojects">
+
+            </ul>
 
         </div>
 
@@ -32,7 +35,7 @@
 
         <div id="todolist">
             <div id="list">
-                <ul id= "ullist">
+                <ul id="ullist">
 
                 </ul>
 
@@ -41,27 +44,27 @@
 
             </div>
 
-            <div id="myForm">
+            <div id="todoform">
                 <form id="form-container">
 
                     <label for="title"><b>Title</b></label>
-                    <input type="text" placeholder="Enter Title" id="titleinput" name="title" >
+                    <input type="text" placeholder="Enter Title" id="titleinput" name="title">
 
                     <label for="description"><b>Description</b></label>
-                    <input type="text" placeholder="Enter Description" id="descripinput" name="descrip" >
+                    <input type="text" placeholder="Enter Description" id="descripinput" name="descrip">
 
                     <label for="date"><b>Date</b></label> <br>
-                    <input type="date" name="date" id="dateinput" >
-                    
+                    <input type="date" name="date" id="dateinput">
+
 
                     <label for="priority"><b>Priority</b></label> <br>
                     <input type="radio" id="low" name="priority" value="low">
                     <label for="low">Low</label> <br>
                     <input type="radio" id="medium" name="priority" value="medium">
                     <label for="medium">Medium</label><br>
-                    <input type="radio" id="high" name="priority" value="high" >
+                    <input type="radio" id="high" name="priority" value="high">
                     <label for="high">High</label><br><br><br>
-                                       
+
 
                     <label for="completed"><b>Completed</b></label> <br>
                     <input type="checkbox" id="completedTrue" name="completed" value="true">
@@ -70,9 +73,19 @@
                     <button type="button" id="btnadd">Add</button>
                     <button type="button" id="btncancel">Cancel</button>
                 </form>
-
             </div>
 
+            <div id="projectform">
+                <form id="project-form-container">
+
+                    <label for="title"><b>Project Name</b></label>
+                    <input type="text" placeholder="Enter Project Name" id="projectnameinput" name="title"
+                        style="margin-top:20px">
+                    <br> <br>
+                    <button type="button" id="btnaddproject">Add</button>
+                    <button type="button" id="btncancelproject">Cancel</button>
+                </form>
+            </div>
         </div>
 
 

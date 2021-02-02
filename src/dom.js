@@ -1,92 +1,163 @@
-import {toDo,
+import {
+    toDo,
     addToProject,
-    getProjectArr
+    getProjectArr,
+    project,
+    addNewProject,
+    listOfProjects
 
 } from './todologic'
 
+/* Loads the page for the first time */
+
 const loadPage = () => {
+    /* Setup and Headings */
+
     let divnav = document.getElementById("nav");
     let navheading = document.createElement("h1");
     navheading.textContent = "To-Do List App";
     divnav.appendChild(navheading);
 
     let divprojectheading = document.getElementById("projectsheading");
-    let projectHeading = document.createElement("h2");
-    projectHeading.textContent = "PROJECTS";
+    let projectHeading = document.createElement("h1");
+    projectHeading.textContent = "Projects";
     divprojectheading.appendChild(projectHeading);
 
-    
-    let buttonNewToDo = document.createElement("button");
+
+    let buttonNewToDo = document.createElement("img");
     buttonNewToDo.id = "buttonnew";
-    buttonNewToDo.textContent = "+";
+    buttonNewToDo.src = "add.png";
     document.getElementById("divnewbutton").appendChild(buttonNewToDo);
 
-    document.getElementById("myForm").style.display = "none";
+    let buttonNewProject = document.createElement("img");
+    buttonNewProject.id = "buttonnewproject";
+    buttonNewProject.src = "add.png";
+    document.getElementById("projects").appendChild(buttonNewProject);
+
+    let toDoForm = document.getElementById("todoform");
+    toDoForm.style.display = "none";
+
+    document.getElementById("projectform").style.display = "none";
+
+    /* Creating Sample Projects */
+
+    let defaultProject1 = project("Project 1", true);
+    addNewProject(defaultProject1);
+    let defaultProject2 = project("Project 2", false);
+    addNewProject(defaultProject2);
+
+
+    /* Creating Sample To-Do Items*/
 
     let defaultItem1 = toDo("Clean room", "Organise and clean room.", "2021-02-05", "high", false);
     let defaultItem2 = toDo("Walk dogs", "Take Bella & Jessie out.", "2021-03-01", "medium", false);
     let defaultItem3 = toDo("Water plants", "Water the plants.", "2021-05-22", "low", true);
 
 
-    addToProject(defaultItem1);
-    addToProject(defaultItem2);
-    addToProject(defaultItem3);
+    addToProject(defaultItem1, "Project 1");
+    addToProject(defaultItem2, "Project 2");
+    addToProject(defaultItem3, "Project 1");
 
+    /* Event Listener for "New To-Do" Button */
 
     buttonNewToDo.addEventListener('click', () => {
-        newItemPrompt();
+        toDoForm.style.display = "block";
     });
 
-    document.getElementById("btncancel").addEventListener('click', () => {
-        document.getElementById("myForm").style.display = "none";
+    /* Event Listener for "New Project" Button */
 
-        
-    });
-
-    document.getElementById("btnadd").addEventListener('click', () => {
-        
-        
-        let title = document.getElementById("titleinput").value;
-        let description = document.getElementById("descripinput").value;
-        let date = document.getElementById("dateinput").value;
-        let priority = "";
-        if (document.getElementById("high").checked) {
-            priority = "high";
-        } 
-        if (document.getElementById("medium").checked) {
-            priority = "medium";
-        } 
-        if (document.getElementById("low").checked) {
-            priority = "low";
-        }
-        let completed = false;
-        if (document.getElementById("completedTrue").checked) {
-            completed == true;
-        }
-
-        //alert(title + " " + description + " " + date + " " + priority + " " + completed);
-
-
-        let newToDo = toDo(title, description, date, priority, completed);
-
-        //newToDo.print();
-        
-        addToProject(newToDo);
-
-        document.getElementById("myForm").style.display = "none";
-        
-
-
+    buttonNewProject.addEventListener('click', () => {
+        document.getElementById("projectform").style.display = "block";
     })
 
+    /* Event listener for cancelling the todo form */
+
+    document.getElementById("btncancel").addEventListener('click', () => {
+        toDoForm.style.display = "none";
+    })
+
+    /* Event listener for cancelling the project form */
+
+    document.getElementById("btncancelproject").addEventListener('click', () => {
+        document.getElementById("projectform").style.display = "none";
+    })
+
+    /* Event listener for submitting the todo form */
+
+    document.getElementById("btnadd").addEventListener('click', () => {
+        submitToDoForm();
+    })
+
+    /* Event listener for submitting the project form */
+
+    document.getElementById("btnaddproject").addEventListener('click', () => {
+        submitProjectForm();
+    })
+
+
+
+
+
+
+
 }
 
-const newItemPrompt = () => {
-    document.getElementById("myForm").style.display = "block";
+const submitToDoForm = () => {
+    /* Grabs the data for the To-Do from input */
+
+    let title = document.getElementById("titleinput").value;
+    let description = document.getElementById("descripinput").value;
+    let date = document.getElementById("dateinput").value;
+    let priority = "";
+    if (document.getElementById("high").checked) {
+        priority = "high";
+    }
+    if (document.getElementById("medium").checked) {
+        priority = "medium";
+    }
+    if (document.getElementById("low").checked) {
+        priority = "low";
+    }
+    let completed = false;
+    if (document.getElementById("completedTrue").checked) {
+        completed = true;
+    }
+
+    /* Creates a new To-Do object */
+
+    let newToDo = toDo(title, description, date, priority, completed);
+
+    /* Adds the new To-Do to the project */
+
+    let i = 0;
+
+    while (listOfProjects[i] != null) {
+        if (listOfProjects[i].getActivity()) {
+            addToProject(newToDo, listOfProjects[i].getName());
+            break;
+        }
+        i++;
+    }
+
+    /* Hides the form */
+
+    document.getElementById("todoform").style.display = "none";
 }
+
+const submitProjectForm = () => {
+    let projectName = document.getElementById("projectnameinput").value;
+
+    let newProject = project(projectName, true);
+    addNewProject(newProject);
+
+    document.getElementById("projectform").style.display = "none";
+
+}
+
 
 const drawToDoList = (arrProject) => {
     let unorderedList = document.getElementById("ullist");
+
 
     while (unorderedList.firstChild) {
         unorderedList.firstChild.remove();
@@ -95,20 +166,35 @@ const drawToDoList = (arrProject) => {
     for (let i = 0; i < arrProject.length; i++) {
         if (arrProject[i] != null) {
             drawToDoItem(arrProject[i]);
-        }      
+        }
     }
 }
 
 const drawToDoItem = (item) => {
-    
+
     let content = document.getElementById("ullist");
 
     let itemList = document.createElement("li")
-    itemList.className = "itemList";
-    
-    itemList.addEventListener('click', () =>{
+    itemList.className = "itemlist";
+
+    let imgCompleted = document.createElement("img");
+    imgCompleted.className = "todoicon";
+    if (item.getCompleted()) {
+        imgCompleted.src = "complete.png";
         itemList.style.textDecoration = "line-through";
-        itemList.style.color == "red";
+    } else {
+        imgCompleted.src = "circle.png";
+    }
+
+    imgCompleted.addEventListener('click', () => {
+        if (item.getCompleted()) {
+            itemList.style.textDecoration = "";
+            imgCompleted.src = "circle.png";
+        } else {
+            itemList.style.textDecoration = "line-through";
+            imgCompleted.src = "complete.png";
+        }
+        item.switchCompleted();
     })
 
     let divTitle = document.createElement("div");
@@ -119,9 +205,23 @@ const drawToDoItem = (item) => {
     divDueDate.textContent = item.getDueDate();
     divDueDate.className = "tododuedate";
 
+    let imgEdit = document.createElement("img");
+    imgEdit.className = "modifyicons";
+    imgEdit.src = "edit.png";
+    imgEdit.addEventListener('click', () => {
+        editToDo(item);
+    })
+
+    let imgDelete = document.createElement("img");
+    imgDelete.className = "modifyicons";
+    imgDelete.src = "delete.png";
+    imgDelete.addEventListener('click', () => {
+        deleteToDo();
+    })
+
+
     if (item.getPriority() == 'high') {
         itemList.style.color = "red";
-        alert('red');
     } else if (item.getPriority() == 'medium') {
         itemList.style.color = "orange";
     } else if (item.getPriority() == 'low') {
@@ -130,18 +230,166 @@ const drawToDoItem = (item) => {
         itemList.style.color = "white";
     }
 
-
+    itemList.appendChild(imgCompleted);
     itemList.appendChild(divTitle);
     itemList.appendChild(divDueDate);
+    itemList.appendChild(imgEdit);
+    itemList.appendChild(imgDelete);
     content.appendChild(itemList);
+}
+
+const drawProjectList = (projectList) => {
+    let unorderedList = document.getElementById("ullistprojects");
+
+    while (unorderedList.firstChild) {
+        unorderedList.firstChild.remove();
+    }
+
+
+    for (let i = 0; i < projectList.length; i++) {
+        if (projectList[i] != null) {
+            drawProject(projectList[i]);
+        }
+    }
 
 
 }
 
+const drawProject = (project) => {
+    let content = document.getElementById("ullistprojects");
+
+    let domproject = document.createElement("li");
+    domproject.className = "domproject";
+
+
+    let divTitle = document.createElement("div");
+    divTitle.textContent = project.getName();
+    divTitle.className = "projecttitle";
+
+
+    let imgEdit = document.createElement("img");
+    imgEdit.className = "modifyicons";
+    imgEdit.src = "edit.png";
+    imgEdit.addEventListener('click', () => {
+        alert("edit project");
+    })
+
+    let imgDelete = document.createElement("img");
+    imgDelete.className = "modifyicons";
+    imgDelete.src = "delete.png";
+    imgDelete.addEventListener('click', () => {
+        alert("delete project")
+    })
+
+    domproject.style.color = "white";
+
+    if (project.getActivity()) {
+        domproject.style.backgroundColor = "#343434";
+        document.getElementById("todoheading").textContent = project.getName();
+    }
+
+    domproject.addEventListener('click', () => {
+        resetProjectActivity();
+        domproject.style.backgroundColor = "#343434";
+        project.setActivity(true);
+        drawToDoList(project.getToDoList());
+
+        document.getElementById("todoheading").textContent = project.getName();
+
+    })
+
+
+
+    domproject.appendChild(divTitle);
+    domproject.appendChild(imgEdit);
+    domproject.appendChild(imgDelete);
+    content.appendChild(domproject);
+
+
+
+
+}
+
+const resetProjectActivity = () => {
+    let allprojects = document.querySelectorAll(".domproject");
+    for (let j = 0; j < allprojects.length; j++) {
+        allprojects[j].style.backgroundColor = "";
+    }
+
+
+    let i = 0;
+    while (listOfProjects[i] != null) {
+        listOfProjects[i].setActivity(false);
+        i++;
+    }
+}
+
+const editToDo = (item) => {
+    //alert(item.getTitle());
+    document.getElementById("todoform").style.display = "block";
+
+    /* Grabs the data for the To-Do from input */
+    document.getElementById("titleinput").value = item.getTitle();
+    document.getElementById("dateinput").value = item.getDueDate();
+    document.getElementById("descripinput").value = item.getDescription();
+
+    /*
+    
+
+    let title = document.getElementById("titleinput").value;
+    let description = document.getElementById("descripinput").value;
+    let date = document.getElementById("dateinput").value;
+    let priority = "";
+    if (document.getElementById("high").checked) {
+        priority = "high";
+    }
+    if (document.getElementById("medium").checked) {
+        priority = "medium";
+    }
+    if (document.getElementById("low").checked) {
+        priority = "low";
+    }
+    let completed = false;
+    if (document.getElementById("completedTrue").checked) {
+        completed = true;
+    }
+
+    Creates a new To - Do object
+
+    let newToDo = toDo(title, description, date, priority, completed);
+
+    Adds the new To - Do to the project
+
+    let i = 0;
+
+    while (listOfProjects[i] != null) {
+        if (listOfProjects[i].getActivity()) {
+            addToProject(newToDo, listOfProjects[i].getName());
+            break;
+        }
+        i++;
+    }
+
+    Hides the form
+
+        */
+
+    document.getElementById("titleinput").value = "";
+    document.getElementById("dateinput").value = "";
+    document.getElementById("descripinput").value = "";
+
+    // document.getElementById("todoform").style.display = "none";
+
+}
+
+const deleteToDo = () => {
+    alert("delete");
+}
+
 export {
     loadPage,
-    newItemPrompt,
     drawToDoItem,
-    drawToDoList
-
+    drawToDoList,
+    drawProjectList,
+    resetProjectActivity
 }
