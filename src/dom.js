@@ -10,6 +10,10 @@ import {
 
 /* Loads the page for the first time */
 
+let editMode = false;
+let oldProjectName = "";
+let oldToDoTitle = "";
+
 const loadPage = () => {
     /* Setup and Headings */
 
@@ -74,29 +78,35 @@ const loadPage = () => {
 
     document.getElementById("btncancel").addEventListener('click', () => {
         toDoForm.style.display = "none";
+        editMode = false;
     })
 
     /* Event listener for cancelling the project form */
 
     document.getElementById("btncancelproject").addEventListener('click', () => {
         document.getElementById("projectform").style.display = "none";
+        editMode = false;
     })
 
     /* Event listener for submitting the todo form */
 
     document.getElementById("btnadd").addEventListener('click', () => {
-        submitToDoForm();
+        submitToDoForm(editMode, oldToDoTitle);
+        editMode = false;
+        oldToDoTitle = "";
+        resetToDoForm();
     })
 
     /* Event listener for submitting the project form */
 
     document.getElementById("btnaddproject").addEventListener('click', () => {
-        submitProjectForm();
+        submitProjectForm(editMode, oldProjectName);
+        editMode = false;
     })
 
 }
 
-const submitToDoForm = () => {
+const submitToDoForm = (editMode, oldTitle) => {
     /* Grabs the data for the To-Do from input */
 
     let title = document.getElementById("titleinput").value;
@@ -117,20 +127,50 @@ const submitToDoForm = () => {
         completed = true;
     }
 
-    /* Creates a new To-Do object */
+    if (editMode == false) {
 
-    let newToDo = toDo(title, description, date, priority, completed);
+        /* Creates a new To-Do object */
 
-    /* Adds the new To-Do to the project */
+        let newToDo = toDo(title, description, date, priority, completed);
 
-    let i = 0;
+        /* Adds the new To-Do to the project */
 
-    while (listOfProjects[i] != null) {
-        if (listOfProjects[i].getActivity()) {
-            addToProject(newToDo, listOfProjects[i].getName());
-            break;
+        let i = 0;
+
+        while (listOfProjects[i] != null) {
+            if (listOfProjects[i].getActivity()) {
+                addToProject(newToDo, listOfProjects[i].getName());
+                break;
+            }
+            i++;
         }
-        i++;
+
+    } else {
+        let i = 0;
+
+        let project;
+
+        while (listOfProjects[i] != null) {
+            if (listOfProjects[i].getActivity()) {
+                let j = 0;
+                while (listOfProjects[i].getToDo(j) != null) {
+                    if (listOfProjects[i].getToDo(j).getTitle() == oldTitle) {
+                        listOfProjects[i].getToDo(j).setTitle(title);
+                        listOfProjects[i].getToDo(j).setDescription(description);
+                        listOfProjects[i].getToDo(j).setDueDate(date);
+                        listOfProjects[i].getToDo(j).setPriority(priority);
+                        listOfProjects[i].getToDo(j).setCompleted(completed);
+                        drawToDoList(listOfProjects[i].getToDoList());
+                        break;
+                    }
+                    j++;
+                }
+                break;
+            }
+            i++;
+        }
+
+
     }
 
     /* Hides the form */
@@ -138,12 +178,28 @@ const submitToDoForm = () => {
     document.getElementById("todoform").style.display = "none";
 }
 
-const submitProjectForm = () => {
-    let projectName = document.getElementById("projectnameinput").value;
+const submitProjectForm = (editMode, oldName) => {
+    let newName = document.getElementById("projectnameinput").value;
 
-    let newProject = project(projectName, true);
-    addNewProject(newProject);
+    if (!editMode) {
+        let newProject = project(newName, true);
+        addNewProject(newProject);
+    }
+    else {
+        let i = 0;
 
+        while (listOfProjects[i] != null) {
+            if (listOfProjects[i].getName() == oldName) {
+                listOfProjects[i].setName(newName);
+                drawProjectList(listOfProjects);
+                break;
+            } else {
+                i++;
+            }
+        }
+        editMode = false;
+        oldProjectName = "";
+    }
     document.getElementById("projectform").style.display = "none";
 
 }
@@ -194,6 +250,10 @@ const drawToDoItem = (item) => {
     let divTitle = document.createElement("div");
     divTitle.textContent = item.getTitle();
     divTitle.className = "todotitle";
+
+    divTitle.addEventListener('click', () => {
+        alert(item.getDescription());
+    })
 
     let divDueDate = document.createElement("div");
     divDueDate.textContent = item.getDueDate();
@@ -266,7 +326,7 @@ const drawProject = (project) => {
     imgEdit.className = "modifyicons";
     imgEdit.src = "edit.png";
     imgEdit.addEventListener('click', () => {
-        alert("edit project");
+        editProject(project);
     })
 
     let imgDelete = document.createElement("img");
@@ -321,61 +381,37 @@ const resetProjectActivity = () => {
 }
 
 const editToDo = (item) => {
-    //alert(item.getTitle());
-    document.getElementById("todoform").style.display = "block";
-
-    /* Grabs the data for the To-Do from input */
     document.getElementById("titleinput").value = item.getTitle();
-    document.getElementById("dateinput").value = item.getDueDate();
     document.getElementById("descripinput").value = item.getDescription();
+    document.getElementById("dateinput").value = item.getDueDate();
+    if (item.getPriority() == "high") {
+        document.getElementById("high").checked = true;
+    } else if (item.getPriority() == "medium") {
+        document.getElementById("medium").checked = true;
+    } else if (item.getPriority() == "low") {
+        document.getElementById("low").checked = true;
+    } else {
 
-    /*
-    
-
-    let title = document.getElementById("titleinput").value;
-    let description = document.getElementById("descripinput").value;
-    let date = document.getElementById("dateinput").value;
-    let priority = "";
-    if (document.getElementById("high").checked) {
-        priority = "high";
     }
-    if (document.getElementById("medium").checked) {
-        priority = "medium";
-    }
-    if (document.getElementById("low").checked) {
-        priority = "low";
-    }
-    let completed = false;
-    if (document.getElementById("completedTrue").checked) {
-        completed = true;
+    if (item.getCompleted() == true) {
+        document.getElementById("completedTrue").checked = true;
     }
 
-    Creates a new To - Do object
 
-    let newToDo = toDo(title, description, date, priority, completed);
+    document.getElementById("todoform").style.display = "block";
+    editMode = true;
+    oldToDoTitle = item.getTitle();
 
-    Adds the new To - Do to the project
+}
 
-    let i = 0;
-
-    while (listOfProjects[i] != null) {
-        if (listOfProjects[i].getActivity()) {
-            addToProject(newToDo, listOfProjects[i].getName());
-            break;
-        }
-        i++;
-    }
-
-    Hides the form
-
-        */
-
-    document.getElementById("titleinput").value = "";
-    document.getElementById("dateinput").value = "";
-    document.getElementById("descripinput").value = "";
-
-    // document.getElementById("todoform").style.display = "none";
-
+const resetToDoForm = () => {
+    document.getElementById("titleinput").value = null;
+    document.getElementById("descripinput").value = null;
+    document.getElementById("dateinput").value = null;
+    document.getElementById("high").checked = false;
+    document.getElementById("medium").checked = false;
+    document.getElementById("low").checked = false;
+    document.getElementById("completedTrue").checked = false;
 }
 
 const deleteToDo = (item) => {
@@ -387,15 +423,22 @@ const deleteToDo = (item) => {
     while (i <= listOfProjects.length - 1) {
         j = 0;
         while (j <= listOfProjects[i].getToDoList().length - 1) {
-            if (listOfProjects[i].getToDo(j).getTitle() == title) {            
+            if (listOfProjects[i].getToDo(j).getTitle() == title) {
                 listOfProjects[i].getToDo(j).setTitle(null);
-                drawToDoList(listOfProjects[i].getToDoList());                                
+                drawToDoList(listOfProjects[i].getToDoList());
                 break;
             }
             j++;
         }
         i++;
     }
+}
+
+const editProject = (project) => {
+    document.getElementById("projectform").style.display = "block";
+    editMode = true;
+    oldProjectName = project.getName();
+
 }
 
 const deleteProject = (project) => {

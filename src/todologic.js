@@ -116,6 +116,22 @@ const toDo = (name, descrip, date, importance, done) => {
         title = newTitle;
     }
 
+    let setDescription = (newDescription) => {
+        description = newDescription;
+    }
+
+    let setDueDate = (newDueDate) => {
+        dueDate = newDueDate;
+    }
+
+    let setPriority = (newPriority) => {
+        priority = newPriority;
+    }
+
+    let setCompleted = (newCompleted) => {
+        completed = newCompleted;
+    }
+
 
 
     let print = function () {
@@ -129,8 +145,13 @@ const toDo = (name, descrip, date, importance, done) => {
         getDueDate,
         getPriority,
         getCompleted,
+        switchCompleted,
         setTitle,
-        switchCompleted
+        setDescription,
+        setDueDate,
+        setPriority,
+        setCompleted
+        
     }
 }
 
