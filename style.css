@@ -163,6 +163,12 @@ img:active {
     transform: scale(0.9);
 }
 
+button {
+    font-size: 18px;
+    font-weight: bold;
+
+}
+
 button:hover {
     transform: scale(1.2);
 }
