@@ -41,9 +41,9 @@ const loadPage = () => {
 
     /* Creating Sample Projects */
 
-    let defaultProject1 = project("Project 1", true);
+    let defaultProject1 = project("Project 1", false);
     addNewProject(defaultProject1);
-    let defaultProject2 = project("Project 2", false);
+    let defaultProject2 = project("Project 2", true);
     addNewProject(defaultProject2);
 
 
@@ -55,8 +55,8 @@ const loadPage = () => {
 
 
     addToProject(defaultItem1, "Project 1");
-    addToProject(defaultItem2, "Project 2");
-    addToProject(defaultItem3, "Project 1");
+    addToProject(defaultItem2, "Project 1");
+    addToProject(defaultItem3, "Project 2");
 
     /* Event Listener for "New To-Do" Button */
 
@@ -93,12 +93,6 @@ const loadPage = () => {
     document.getElementById("btnaddproject").addEventListener('click', () => {
         submitProjectForm();
     })
-
-
-
-
-
-
 
 }
 
@@ -164,7 +158,7 @@ const drawToDoList = (arrProject) => {
     }
 
     for (let i = 0; i < arrProject.length; i++) {
-        if (arrProject[i] != null) {
+        if (arrProject[i].getTitle() != null) {
             drawToDoItem(arrProject[i]);
         }
     }
@@ -216,7 +210,7 @@ const drawToDoItem = (item) => {
     imgDelete.className = "modifyicons";
     imgDelete.src = "delete.png";
     imgDelete.addEventListener('click', () => {
-        deleteToDo();
+        deleteToDo(item);
     })
 
 
@@ -247,13 +241,14 @@ const drawProjectList = (projectList) => {
 
 
     for (let i = 0; i < projectList.length; i++) {
-        if (projectList[i] != null) {
+        if (projectList[i].getName() != null) {
             drawProject(projectList[i]);
         }
     }
 
 
 }
+
 
 const drawProject = (project) => {
     let content = document.getElementById("ullistprojects");
@@ -278,7 +273,8 @@ const drawProject = (project) => {
     imgDelete.className = "modifyicons";
     imgDelete.src = "delete.png";
     imgDelete.addEventListener('click', () => {
-        alert("delete project")
+        deleteProject(project);
+
     })
 
     domproject.style.color = "white";
@@ -288,7 +284,7 @@ const drawProject = (project) => {
         document.getElementById("todoheading").textContent = project.getName();
     }
 
-    domproject.addEventListener('click', () => {
+    divTitle.addEventListener('click', () => {
         resetProjectActivity();
         domproject.style.backgroundColor = "#343434";
         project.setActivity(true);
@@ -382,8 +378,48 @@ const editToDo = (item) => {
 
 }
 
-const deleteToDo = () => {
-    alert("delete");
+const deleteToDo = (item) => {
+    let title = item.getTitle();
+
+    let i = 0;
+    let j = 0;
+
+    while (i <= listOfProjects.length - 1) {
+        j = 0;
+        while (j <= listOfProjects[i].getToDoList().length - 1) {
+            if (listOfProjects[i].getToDo(j).getTitle() == title) {            
+                listOfProjects[i].getToDo(j).setTitle(null);
+                drawToDoList(listOfProjects[i].getToDoList());                                
+                break;
+            }
+            j++;
+        }
+        i++;
+    }
+}
+
+const deleteProject = (project) => {
+    let i = 0;
+    while (listOfProjects[i] != null) {
+        if (listOfProjects[i].getName() == project.getName()) {
+            listOfProjects[i].setName(null);
+            listOfProjects[i].setToDoList(null);
+
+            break;
+        }
+        i++;
+    }
+    resetProjectActivity();
+
+    i = 0;
+
+    while (listOfProjects[i].getName() == null) {
+        i++;
+    }
+    listOfProjects[i].setActivity(true);
+    drawProjectList(listOfProjects);
+
+    drawToDoList(listOfProjects[i].getToDoList());
 }
 
 export {

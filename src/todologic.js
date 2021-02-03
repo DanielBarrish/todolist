@@ -25,6 +25,18 @@ const project = (title, active) => {
         return toDoList;
     }
 
+    let getToDo = (i) => {
+        return toDoList[i];
+    }
+
+    let setName = (newName) => {
+        name = newName;
+    } 
+
+    let setToDoList = (newArray) => {
+        toDoList = newArray;
+    }
+
     let setID = (newID) => {
         id = newID;
     }
@@ -43,7 +55,10 @@ const project = (title, active) => {
         getActivity, 
         getID,
         getToDoList,
-        setID ,
+        getToDo,
+        setName, 
+        setID,
+        setToDoList,
         setActivity,
         getString,
         getToDoList   
@@ -97,6 +112,10 @@ const toDo = (name, descrip, date, importance, done) => {
         completed = !completed;
     }
 
+    let setTitle = (newTitle) => {
+        title = newTitle;
+    }
+
 
 
     let print = function () {
@@ -110,6 +129,7 @@ const toDo = (name, descrip, date, importance, done) => {
         getDueDate,
         getPriority,
         getCompleted,
+        setTitle,
         switchCompleted
     }
 }
